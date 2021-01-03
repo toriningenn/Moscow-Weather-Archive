@@ -32,19 +32,8 @@ public class FileUploadController {
             attributes.addFlashAttribute("message", "Please select a file to upload.");
             return "redirect:/";
         }
+
         weatherDAO.save(file);
-
-
-        // save the file on the local file system
-        //try {
-       //     Path path = Paths.get(UPLOAD_DIR + "/" + fileName);
-       //     Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-       // } catch (IOException e) {
-       //     e.printStackTrace();
-       // }
-
-        // return success response
-        //attributes.addFlashAttribute("message", "You successfully uploaded " + fileName + '!');
 
         return "redirect:/";
     }

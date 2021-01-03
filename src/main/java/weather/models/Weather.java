@@ -2,16 +2,15 @@ package weather.models;
 
 
 
-import javax.persistence.Entity;
-
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 @Entity
 public class Weather {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int Id;
     private String date;
     private String time;
     private double T;
