@@ -10,7 +10,7 @@ public class Weather {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id;
+    private int id;
     private String date;
     private String time;
     private double T;

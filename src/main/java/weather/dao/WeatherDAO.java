@@ -14,9 +14,42 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class WeatherDAO {
+
+    public static List<Weather> showAllWeather() {
+
+        Configuration configuration = new Configuration();
+        configuration.configure("hibernate.cfg.xml");
+        StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+        configuration.buildSessionFactory();
+        SessionFactory sessionFactory = configuration.buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        List<Weather> allWeather= session.createQuery("FROM Weather WHERE date LIKE '17.01.2013' ", Weather.class).getResultList();
+            session.close();;
+            return allWeather;
+        //When you write HQL (or JPQL) queries, you use the names of the types, not the tables!!!
+    }
+
+    public static String getStringValue(int i, Row row) {
+        Cell cell = row.getCell(i);
+                try {
+                    return cell.getStringCellValue();
+                } catch (Exception e) {
+                    return null;
+                }
+    }
+
+    public static Double getNumericValue(int i, Row row) {
+        Cell cell = row.getCell(i);
+        try {
+            return cell.getNumericCellValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public void save(MultipartFile file) throws IOException, ParseException {
         Configuration configuration = new Configuration();
@@ -35,64 +68,65 @@ public class WeatherDAO {
 
             for (int i = 7; i < sheet.getLastRowNum(); i++) {
 
-                    Session session = sessionFactory.openSession();
-                    session.beginTransaction();
+                Session session = sessionFactory.openSession();
+                session.beginTransaction();
 
-                    Row row = (Row) sheet.getRow(i);
-                    Weather weather = new Weather();
+                Row row = (Row) sheet.getRow(i);
+                Weather weather = new Weather();
                 try {
-                    String date = row.getCell(0).getStringCellValue();
+                    String date = WeatherDAO.getStringValue(0,row);
                     weather.setDate(date);
 
 
-                    String time = row.getCell(1).getStringCellValue();
+                    String time = WeatherDAO.getStringValue(1,row);
                     weather.setTime(time);
 
 
-                    double T = row.getCell(2).getNumericCellValue();
+                    double T = WeatherDAO.getNumericValue(2,row);
                     weather.setT(T);
 
 
-                    double vlh = row.getCell(3).getNumericCellValue();
+                    double vlh = WeatherDAO.getNumericValue(3,row);;
                     weather.setVlh(vlh);
 
 
-                    double Td = row.getCell(4).getNumericCellValue();
+                    double Td = WeatherDAO.getNumericValue(4,row);;
                     weather.setTd(Td);
 
-                    double pressure = row.getCell(5).getNumericCellValue();
+                    double pressure = WeatherDAO.getNumericValue(5,row);;
                     weather.setPressure(pressure);
 
 
-                    String wind = row.getCell(6).getStringCellValue();
+                    String wind = WeatherDAO.getStringValue(6,row);
                     weather.setWind(wind);
 
-                    String speed = row.getCell(7).getStringCellValue();
+                    String speed = WeatherDAO.getStringValue(7,row);
                     weather.setSpeed(speed);
 
-                    double obl = row.getCell(8).getNumericCellValue();
+                    double obl = WeatherDAO.getNumericValue(8,row);;
                     weather.setObl(obl);
 
 
-                    double h = row.getCell(9).getNumericCellValue();
+                    double h = WeatherDAO.getNumericValue(9,row);;
                     weather.setH(h);
 
 
-                    String vv = row.getCell(10).getStringCellValue();
+                    String vv = WeatherDAO.getStringValue(10,row);
                     weather.setVv(vv);
 
 
-                    String weatherCond = row.getCell(11).getStringCellValue();
+                    String weatherCond = WeatherDAO.getStringValue(11,row);
                     weather.setWeatherCond(weatherCond);
 
                     System.out.println(weather.getDate());
                     System.out.println(weather.getTime());
                     System.out.println(weather.getPressure());
                     System.out.println(weather.getWeatherCond());
-                } catch (Exception e) {}
-                    session.save(weather);
-                    session.getTransaction().commit();
-                    session.close();
+                } catch (Exception e) {
+                }
+                session.save(weather);
+                session.getTransaction().commit();
+                session.close();
             }
         }
         workbook.close();
