@@ -21,7 +21,7 @@ public class MySpringMvcDispatcherServletInitializer extends AbstractAnnotationC
     @Override
     protected String[] getServletMappings() {
         return new String[] {"/"};
-    } //ВСЕ HTTP запросы от пользователя мы посылаем на DispatcherServlet
+    }
 
     @Override
     public void onStartup(ServletContext aServletContext) throws ServletException {

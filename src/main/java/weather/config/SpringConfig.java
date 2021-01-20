@@ -31,15 +31,30 @@ public class SpringConfig implements WebMvcConfigurer {
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
+        templateResolver.setTemplateMode("HTML");
         templateResolver.setPrefix("/WEB-INF/views/");
         templateResolver.setSuffix(".html");
         return templateResolver;
     }
 
     @Bean
+    public SpringResourceTemplateResolver javascriptTemplateResolver() {
+        SpringResourceTemplateResolver javascriptTemplateResolver = new SpringResourceTemplateResolver();
+        javascriptTemplateResolver.setApplicationContext(applicationContext);
+        javascriptTemplateResolver.setTemplateMode("JAVASCRIPT");
+        javascriptTemplateResolver.setPrefix("/WEB-INF/JS/");
+        javascriptTemplateResolver.setSuffix(".js");
+        javascriptTemplateResolver.setCheckExistence(true);
+        javascriptTemplateResolver.setOrder(0);
+        return javascriptTemplateResolver;
+    }
+
+
+    @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        templateEngine.setTemplateResolver(templateResolver());
+        templateEngine.addTemplateResolver(javascriptTemplateResolver());
+        templateEngine.addTemplateResolver(templateResolver());
         templateEngine.setEnableSpringELCompiler(true);
         return templateEngine;
     }
