@@ -11,7 +11,6 @@
     org.postgresql.Driver
   </property>
 
-  <!-- Assume test is the database name -->
   <property name="hibernate.connection.url">
     jdbc:postgresql://localhost:5432/weather
   </property>

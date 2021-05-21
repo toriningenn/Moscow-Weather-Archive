@@ -1,9 +1,5 @@
 package weather.models;
-
-
-
 import javax.persistence.*;
-
 
 @Entity
 public class Weather {
@@ -104,7 +100,6 @@ public class Weather {
     public String getVv() {
         return vv;
     }
-
 
     public void setTd(double td) {
         Td = td;
