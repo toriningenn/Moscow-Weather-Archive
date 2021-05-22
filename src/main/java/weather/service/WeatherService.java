@@ -6,6 +6,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,22 +19,24 @@ import java.util.List;
 
 @Service
 public class WeatherService {
-    //берёт всё из датабазы
-    public static List<Weather> showAllWeather() {
+
+    public List<Weather> getWeather(int min, int max) {
         Configuration configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml");
         StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
         configuration.buildSessionFactory();
         SessionFactory sessionFactory = configuration.buildSessionFactory();
         Session session = sessionFactory.openSession();
-        List<Weather> allWeather = session.createQuery("FROM Weather", Weather.class).getResultList();
+        Query<Weather> query = session.createQuery("FROM Weather", Weather.class);
+        query.setFirstResult(min);
+        query.setMaxResults(max);
+        List<Weather> results = query.list();
         session.close();
-        ;
-        return allWeather;
+
+        return results;
         //When you write HQL (or JPQL) queries, you use the names of the types, not the tables!!!
     }
 
-    //достать строку из экселя
     public static String getStringValue(int i, Row row) {
         Cell cell = row.getCell(i);
         try {
@@ -73,35 +76,27 @@ public class WeatherService {
 
                 Session session = sessionFactory.openSession();
                 session.beginTransaction();
-
                 Row row = (Row) sheet.getRow(i);
                 Weather weather = new Weather();
+
                 try {
                     String date = WeatherService.getStringValue(0, row);
                     weather.setDate(date);
 
-
                     String time = WeatherService.getStringValue(1, row);
                     weather.setTime(time);
-
 
                     double T = WeatherService.getNumericValue(2, row);
                     weather.setT(T);
 
-
                     double vlh = WeatherService.getNumericValue(3, row);
-                    ;
                     weather.setVlh(vlh);
 
-
                     double Td = WeatherService.getNumericValue(4, row);
-                    ;
                     weather.setTd(Td);
 
                     double pressure = WeatherService.getNumericValue(5, row);
-                    ;
                     weather.setPressure(pressure);
-
 
                     String wind = WeatherService.getStringValue(6, row);
                     weather.setWind(wind);
@@ -110,26 +105,17 @@ public class WeatherService {
                     weather.setSpeed(speed);
 
                     double obl = WeatherService.getNumericValue(8, row);
-                    ;
                     weather.setObl(obl);
 
-
                     double h = WeatherService.getNumericValue(9, row);
-                    ;
                     weather.setH(h);
-
 
                     String vv = WeatherService.getStringValue(10, row);
                     weather.setVv(vv);
 
-
                     String weatherCond = WeatherService.getStringValue(11, row);
                     weather.setWeatherCond(weatherCond);
 
-                    System.out.println(weather.getDate());
-                    System.out.println(weather.getTime());
-                    System.out.println(weather.getPressure());
-                    System.out.println(weather.getWeatherCond());
                 } catch (Exception e) {
                 }
                 session.save(weather);
