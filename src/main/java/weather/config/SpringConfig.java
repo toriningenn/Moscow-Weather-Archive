@@ -20,53 +20,9 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 @EnableWebMvc
 public class SpringConfig implements WebMvcConfigurer {
 
-    private final ApplicationContext applicationContext;
-
     @Autowired
     public SpringConfig(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
     }
-
-    @Bean
-    public SpringResourceTemplateResolver templateResolver() {
-        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-        templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setTemplateMode("HTML");
-        templateResolver.setPrefix("/WEB-INF/views/");
-        templateResolver.setSuffix(".html");
-        return templateResolver;
-    }
-
-    @Bean
-    public SpringResourceTemplateResolver javascriptTemplateResolver() {
-        SpringResourceTemplateResolver javascriptTemplateResolver = new SpringResourceTemplateResolver();
-        javascriptTemplateResolver.setApplicationContext(applicationContext);
-        javascriptTemplateResolver.setTemplateMode("JAVASCRIPT");
-        javascriptTemplateResolver.setPrefix("/WEB-INF/JS/");
-        javascriptTemplateResolver.setSuffix(".js");
-        javascriptTemplateResolver.setCheckExistence(true);
-        javascriptTemplateResolver.setOrder(0);
-        return javascriptTemplateResolver;
-    }
-
-
-    @Bean
-    public SpringTemplateEngine templateEngine() {
-        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        templateEngine.addTemplateResolver(javascriptTemplateResolver());
-        templateEngine.addTemplateResolver(templateResolver());
-        templateEngine.setEnableSpringELCompiler(true);
-        return templateEngine;
-    }
-
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-        resolver.setTemplateEngine(templateEngine());
-        registry.viewResolver(resolver);
-        resolver.setCharacterEncoding("UTF-8");
-    }
-
 
     @Bean(name = "multipartResolver")
     public CommonsMultipartResolver multipartResolver() {

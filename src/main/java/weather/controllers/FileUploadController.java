@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import weather.models.Weather;
 import weather.service.WeatherService;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -32,11 +34,11 @@ public class FileUploadController {
     }
 
     @GetMapping(value = "/{page}")
-    public String getAllData(@PathVariable int page) throws JsonProcessingException {
+    @ResponseBody
+    public List<Weather> getAllData(@PathVariable("page") int page) throws JsonProcessingException {
         System.out.println("OK");
         int max = 25;
         int min = max * page;
-        System.out.println(mapper.writeValueAsString(weatherService.getWeather(min, max)));
-       return mapper.writeValueAsString(weatherService.getWeather(min, max));
+       return weatherService.getWeather(min, max);
     }
 }
