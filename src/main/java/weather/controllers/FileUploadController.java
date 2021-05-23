@@ -25,12 +25,16 @@ public class FileUploadController {
     }
 
     @PostMapping(value = "/upload")
-    public void uploadFile(@RequestParam("files0") MultipartFile multipartFile,
-                           @RequestParam("files1") MultipartFile multipartFile1,
-                           @RequestParam("files2") MultipartFile multipartFile2) throws IOException, ParseException {
+    public void uploadFile(@RequestParam(value = "files0") MultipartFile multipartFile,
+                           @RequestParam(value = "files1", required = false) MultipartFile multipartFile1,
+                           @RequestParam(value = "files2", required = false) MultipartFile multipartFile2) throws IOException, ParseException {
         weatherService.save(multipartFile);
-        weatherService.save(multipartFile1);
-        weatherService.save(multipartFile2);
+        if(multipartFile1 != null) {
+            weatherService.save(multipartFile1);
+        }
+        if(multipartFile2 != null) {
+            weatherService.save(multipartFile2);
+        }
     }
 
     @GetMapping(value = "/{page}")

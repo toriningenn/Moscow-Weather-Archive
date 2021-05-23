@@ -101,7 +101,7 @@ public class WeatherService {
                     String wind = WeatherService.getStringValue(6, row);
                     weather.setWind(wind);
 
-                    String speed = WeatherService.getStringValue(7, row);
+                    Double speed = WeatherService.getNumericValue(7, row);
                     weather.setSpeed(speed);
 
                     double obl = WeatherService.getNumericValue(8, row);
@@ -110,7 +110,7 @@ public class WeatherService {
                     double h = WeatherService.getNumericValue(9, row);
                     weather.setH(h);
 
-                    String vv = WeatherService.getStringValue(10, row);
+                    Double vv = WeatherService.getNumericValue(10, row);
                     weather.setVv(vv);
 
                     String weatherCond = WeatherService.getStringValue(11, row);

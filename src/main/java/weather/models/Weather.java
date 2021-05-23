@@ -14,10 +14,10 @@ public class Weather {
     private double Td;
     private double pressure;
     private String wind;
-    String speed;
+    Double speed;
     double obl;
     double h;
-    String vv;
+    Double vv;
     String weatherCond;
 
 
@@ -45,7 +45,7 @@ public class Weather {
         this.wind = wind;
     }
 
-    public void setSpeed(String speed) {
+    public void setSpeed(Double speed) {
         this.speed = speed;
     }
 
@@ -57,7 +57,7 @@ public class Weather {
         this.h = h;
     }
 
-    public void setVv(String vv) {
+    public void setVv(Double vv) {
         this.vv = vv;
     }
 
@@ -85,7 +85,7 @@ public class Weather {
         return wind;
     }
 
-    public String getSpeed() {
+    public Double getSpeed() {
         return speed;
     }
 
@@ -97,7 +97,7 @@ public class Weather {
         return h;
     }
 
-    public String getVv() {
+    public Double getVv() {
         return vv;
     }
 

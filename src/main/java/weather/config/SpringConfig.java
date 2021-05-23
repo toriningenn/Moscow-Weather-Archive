@@ -21,13 +21,13 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 public class SpringConfig implements WebMvcConfigurer {
 
     @Autowired
-    public SpringConfig(ApplicationContext applicationContext) {
+    public SpringConfig() {
     }
 
     @Bean(name = "multipartResolver")
     public CommonsMultipartResolver multipartResolver() {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        multipartResolver.setMaxUploadSize(-1);
+        multipartResolver.setMaxUploadSize(1000000000);
         return multipartResolver;
     }
 }
