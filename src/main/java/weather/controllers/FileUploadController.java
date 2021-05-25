@@ -39,10 +39,19 @@ public class FileUploadController {
 
     @GetMapping(value = "/{page}")
     @ResponseBody
-    public List<Weather> getAllData(@PathVariable("page") int page) throws JsonProcessingException {
+    public List<Weather> getDataByPage(@PathVariable("page") int page) throws JsonProcessingException {
         System.out.println("OK");
-        int max = 25;
+        int max = 100;
         int min = max * page;
+        System.out.println(weatherService.getWeather(min, max));
        return weatherService.getWeather(min, max);
+    }
+
+    //not needed when using react-table pagination
+    @GetMapping(value = "/data")
+    @ResponseBody
+    public List<Weather> getAllData() throws JsonProcessingException {
+    System.out.println(mapper.writeValueAsString(weatherService.getAllWeather()));
+    return weatherService.getAllWeather();
     }
 }

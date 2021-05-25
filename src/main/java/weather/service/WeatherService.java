@@ -1,15 +1,12 @@
 package weather.service;
 
 import org.apache.poi.ss.usermodel.*;
-
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.*;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import weather.config.ConfigureHibernateMethod;
 import weather.models.Weather;
 
 import java.io.IOException;
@@ -20,13 +17,24 @@ import java.util.List;
 @Service
 public class WeatherService {
 
+    final ConfigureHibernateMethod configureHibernateMethod;
+
+    public WeatherService(ConfigureHibernateMethod configureHibernateMethod) {
+        this.configureHibernateMethod = configureHibernateMethod;
+    }
+
+    public List<Weather> getAllWeather() {
+        Session session = configureHibernateMethod.GetSession();
+        Query<Weather> query = session.createQuery("FROM Weather", Weather.class);
+        List<Weather> results = query.list();
+        session.close();
+
+        return results;
+        //When you write HQL (or JPQL) queries, you use the names of the types, not the tables!!!
+    }
+
     public List<Weather> getWeather(int min, int max) {
-        Configuration configuration = new Configuration();
-        configuration.configure("hibernate.cfg.xml");
-        StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-        configuration.buildSessionFactory();
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session = configureHibernateMethod.GetSession();
         Query<Weather> query = session.createQuery("FROM Weather", Weather.class);
         query.setFirstResult(min);
         query.setMaxResults(max);
@@ -34,7 +42,6 @@ public class WeatherService {
         session.close();
 
         return results;
-        //When you write HQL (or JPQL) queries, you use the names of the types, not the tables!!!
     }
 
     public static String getStringValue(int i, Row row) {
@@ -58,11 +65,7 @@ public class WeatherService {
 
     //разбирается в экселях, складывает в датабазу
     public void save(MultipartFile file) throws IOException, ParseException {
-        Configuration configuration = new Configuration();
-        configuration.configure("hibernate.cfg.xml");
-        StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-        configuration.buildSessionFactory();
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
+        SessionFactory sessionFactory = configureHibernateMethod.GetSessionFactory();
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
 
         String filePatch = file.getOriginalFilename();
