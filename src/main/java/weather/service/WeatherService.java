@@ -4,6 +4,9 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.*;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import weather.config.ConfigureHibernateMethod;
@@ -16,32 +19,46 @@ import java.util.List;
 
 @Service
 public class WeatherService {
+    @Autowired
+    SessionFactory sessionFactory = ConfigureHibernateMethod.GetSessionFactory();
 
-    final ConfigureHibernateMethod configureHibernateMethod;
-
-    public WeatherService(ConfigureHibernateMethod configureHibernateMethod) {
-        this.configureHibernateMethod = configureHibernateMethod;
+    public WeatherService(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public List<Weather> getAllWeather() {
-        Session session = configureHibernateMethod.GetSession();
-        Query<Weather> query = session.createQuery("FROM Weather", Weather.class);
+        Session session = sessionFactory.openSession();
+        Query<Weather> query = session.createQuery("FROM Weather ORDER BY date", Weather.class);
         List<Weather> results = query.list();
-        session.close();
-
+        if (session.isOpen()) {
+            session.close();
+        }
         return results;
         //When you write HQL (or JPQL) queries, you use the names of the types, not the tables!!!
     }
 
     public List<Weather> getWeather(int min, int max) {
-        Session session = configureHibernateMethod.GetSession();
-        Query<Weather> query = session.createQuery("FROM Weather", Weather.class);
-        query.setFirstResult(min);
-        query.setMaxResults(max);
-        List<Weather> results = query.list();
-        session.close();
-
-        return results;
+        Session session = sessionFactory.openSession();
+        try {
+            Query<Weather> query = session.createQuery("FROM Weather ORDER BY date", Weather.class);
+            query.setFirstResult(min);
+            query.setMaxResults(max);
+            List<Weather> results = query.list();
+            if (session.isOpen()) {
+                session.close();
+            }
+            return results;
+        } catch (Exception e) {
+            System.out.println(e);
+            if (session.isOpen()) {
+                session.close();
+            }
+            return null;
+        } finally {
+            if (session.isOpen()) {
+                session.close();
+            }
+        }
     }
 
     public static String getStringValue(int i, Row row) {
@@ -63,9 +80,8 @@ public class WeatherService {
         }
     }
 
-    //разбирается в экселях, складывает в датабазу
+    //поправить сессии
     public void save(MultipartFile file) throws IOException, ParseException {
-        SessionFactory sessionFactory = configureHibernateMethod.GetSessionFactory();
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
 
         String filePatch = file.getOriginalFilename();
@@ -121,9 +137,19 @@ public class WeatherService {
 
                 } catch (Exception e) {
                 }
-                session.save(weather);
-                session.getTransaction().commit();
-                session.close();
+                try {
+                    session.save(weather);
+                    session.getTransaction().commit();
+                    if (session.isOpen()) {
+                        session.close();
+                    }
+                } catch (Exception e) {
+
+                } finally {
+                    if (session.isOpen()) {
+                        session.close();
+                    }
+                }
             }
         }
         workbook.close();

@@ -10,7 +10,6 @@
   <property name="hibernate.connection.driver_class">
     org.postgresql.Driver
   </property>
-
   <property name="hibernate.connection.url">
     jdbc:postgresql://localhost:5432/weather
   </property>
@@ -20,6 +19,8 @@
   <property name="hibernate.connection.password">
     postgres
   </property>
+  <property name="hibernate.transaction.auto_close_session">
+    true</property>
   <mapping class = "weather.models.Weather"/>
 
 </session-factory>

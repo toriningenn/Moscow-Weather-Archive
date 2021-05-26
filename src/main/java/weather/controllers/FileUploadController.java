@@ -43,7 +43,6 @@ public class FileUploadController {
         System.out.println("OK");
         int max = 100;
         int min = max * page;
-        System.out.println(weatherService.getWeather(min, max));
        return weatherService.getWeather(min, max);
     }
 
