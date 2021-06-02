@@ -1,5 +1,10 @@
 package weather.models;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 
 @Entity
 public class Weather {
@@ -7,7 +12,9 @@ public class Weather {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String date;
+
+    private Date date;
+
     private String time;
     private double T;
     private double vlh;
@@ -20,8 +27,7 @@ public class Weather {
     Double vv;
     String weatherCond;
 
-
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -61,7 +67,7 @@ public class Weather {
         this.vv = vv;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 

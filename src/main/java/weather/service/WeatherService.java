@@ -3,6 +3,7 @@ package weather.service;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,9 @@ import weather.config.ConfigureHibernateMethod;
 import weather.models.Weather;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -28,7 +31,7 @@ public class WeatherService {
 
     public List<Weather> getAllWeather() {
         Session session = sessionFactory.openSession();
-        Query<Weather> query = session.createQuery("FROM Weather ORDER BY date", Weather.class);
+        Query<Weather> query = session.createQuery("FROM Weather ORDER BY date,time", Weather.class);
         List<Weather> results = query.list();
         if (session.isOpen()) {
             session.close();
@@ -39,20 +42,14 @@ public class WeatherService {
 
     public List<Weather> getWeather(int min, int max) {
         Session session = sessionFactory.openSession();
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            Query<Weather> query = session.createQuery("FROM Weather ORDER BY date", Weather.class);
-            query.setFirstResult(min);
-            query.setMaxResults(max);
-            List<Weather> results = query.list();
-            if (session.isOpen()) {
-                session.close();
-            }
+            Query<Weather> query = session.createNativeQuery("SELECT w.* FROM public.weather w ORDER BY date, time limit " + max +" offset " + min, Weather.class);
+            List<Weather> results = query.getResultList();
+            System.out.println(mapper.writeValueAsString(results));
             return results;
         } catch (Exception e) {
-            System.out.println(e);
-            if (session.isOpen()) {
-                session.close();
-            }
+            System.out.println(e.getMessage());
             return null;
         } finally {
             if (session.isOpen()) {
@@ -70,7 +67,7 @@ public class WeatherService {
         }
     }
 
-    //достать чисто из экселя
+
     public static Double getNumericValue(int i, Row row) {
         Cell cell = row.getCell(i);
         try {
@@ -85,21 +82,25 @@ public class WeatherService {
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
 
         String filePatch = file.getOriginalFilename();
-
+        Session session = sessionFactory.openSession();
+        int sh = 0;
         while (workbook.sheetIterator().hasNext()) {
-            int sh = 0;
             Sheet sheet = workbook.getSheetAt(sh);
             sh++;
 
             for (int i = 7; i < sheet.getLastRowNum(); i++) {
 
-                Session session = sessionFactory.openSession();
-                session.beginTransaction();
                 Row row = (Row) sheet.getRow(i);
                 Weather weather = new Weather();
 
                 try {
-                    String date = WeatherService.getStringValue(0, row);
+                    String stringDate = WeatherService.getStringValue(0, row);
+                    String year = stringDate.substring(6);
+                    String month = stringDate.substring(3,5);
+                    String day = stringDate.substring(0,2);
+                    String formattedDate = year + "-" + month + "-" + day;
+                    Date date = Date.valueOf(formattedDate);
+                   //"yyyy-[m]m-[d]d"
                     weather.setDate(date);
 
                     String time = WeatherService.getStringValue(1, row);
@@ -135,25 +136,19 @@ public class WeatherService {
                     String weatherCond = WeatherService.getStringValue(11, row);
                     weather.setWeatherCond(weatherCond);
 
-                } catch (Exception e) {
-                }
-                try {
+                    session.beginTransaction();
                     session.save(weather);
                     session.getTransaction().commit();
-                    if (session.isOpen()) {
-                        session.close();
-                    }
                 } catch (Exception e) {
-
-                } finally {
-                    if (session.isOpen()) {
-                        session.close();
-                    }
+                    System.out.println(e);
                 }
             }
         }
         workbook.close();
         file.getInputStream().close();
+        if (session.isOpen()) {
+            session.close();
+        }
     }
 }
 

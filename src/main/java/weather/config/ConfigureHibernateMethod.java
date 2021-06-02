@@ -15,8 +15,4 @@ public class ConfigureHibernateMethod {
         configuration.buildSessionFactory();
         return configuration.buildSessionFactory();
     }
-    /**public Session GetSession() {
-        SessionFactory sessionFactory = GetSessionFactory();
-        return sessionFactory.openSession();
-    }**/
 }
