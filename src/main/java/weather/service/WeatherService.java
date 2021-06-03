@@ -1,4 +1,5 @@
 package weather.service;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.*;
@@ -6,16 +7,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import weather.config.ConfigureHibernateMethod;
 import weather.models.Weather;
+
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.Time;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 
 @Service
@@ -78,7 +87,6 @@ public class WeatherService {
         }
     }
 
-    //поправить сессии
     public void save(MultipartFile file) throws IOException, ParseException {
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
 
@@ -96,15 +104,14 @@ public class WeatherService {
 
                 try {
                     String stringDate = WeatherService.getStringValue(0, row);
-                    String year = stringDate.substring(6);
-                    String month = stringDate.substring(3, 5);
-                    String day = stringDate.substring(0, 2);
-                    String formattedDate = year + "-" + month + "-" + day;
-                    Date date = Date.valueOf(formattedDate);
-                    //"yyyy-[m]m-[d]d"
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.uuuu");
+                    LocalDate localDate = LocalDate.parse(stringDate, formatter);
+                    Date date = Date.valueOf(localDate);
                     weather.setDate(date);
 
-                    String time = WeatherService.getStringValue(1, row);
+                    String stringTime = WeatherService.getStringValue(1, row);
+                    LocalTime localTime = LocalTime.parse(stringTime);
+                    Time time = Time.valueOf(localTime);
                     weather.setTime(time);
 
                     double T = WeatherService.getNumericValue(2, row);
@@ -142,6 +149,7 @@ public class WeatherService {
                     session.getTransaction().commit();
                 } catch (Exception e) {
                     System.out.println(e);
+                    e.printStackTrace();
                 }
             }
         }

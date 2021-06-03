@@ -1,6 +1,8 @@
 package weather.models;
+
 import javax.persistence.*;
 import java.sql.Date;
+import java.sql.Time;
 
 @Entity
 public class Weather {
@@ -9,7 +11,7 @@ public class Weather {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Date date;
-    private String time;
+    private Time time;
     private double T;
     private double vlh;
     private double Td;
@@ -25,7 +27,7 @@ public class Weather {
         this.date = date;
     }
 
-    public void setTime(String time) {
+    public void setTime(Time time) {
         this.time = time;
     }
 
@@ -65,7 +67,7 @@ public class Weather {
         return date;
     }
 
-    public String getTime() {
+    public Time getTime() {
         return time;
     }
 
