@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  app:
+    image: whstw/moscowweatherarchive
+    ports:
+      - 8080:8080
+    working_dir: /MoscowWeatherArchive
+    volumes:
+      - ./:/moscowweatherarchive
+
+  reactapp:
+    image: whstw/weatherinmoscowreact
+    ports:
+      - 3000:80
+
+  sqldb:
+    image: whstw/weather_sqldb
+    volumes:
+      - sql-data:/var/lib/postgresql/data
+    environment: 
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: todos
+
+volumes:
+  sql-data:

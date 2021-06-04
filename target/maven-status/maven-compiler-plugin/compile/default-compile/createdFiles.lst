@@ -1,0 +1,6 @@
+weather/config/ConfigureHibernateMethod.class
+weather/service/WeatherService.class
+weather/models/Weather.class
+weather/controllers/FileUploadController.class
+weather/config/SpringConfig.class
+weather/config/MySpringMvcDispatcherServletInitializer.class
