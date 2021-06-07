@@ -1,8 +1,8 @@
-version: "3.7"
+version: "3.8"
 
 services:
   app:
-    image: whstw/moscowweatherarchive
+    image: whstw/moscowweatherarchive:latest
     ports:
       - 8080:8080
     working_dir: /MoscowWeatherArchive
@@ -10,7 +10,7 @@ services:
       - ./:/moscowweatherarchive
 
   reactapp:
-    image: whstw/weatherinmoscowreact
+    image: whstw/weatherinmoscowreact:latest
     ports:
       - 3000:80
 
