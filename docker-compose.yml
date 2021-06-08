@@ -15,12 +15,13 @@ services:
       - 3000:80
 
   sqldb:
-    image: whstw/weather_sqldb
+    image: whstw/weather_sqldb:latest
     volumes:
       - sql-data:/var/lib/postgresql/data
-    environment: 
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: todos
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: weather
 
 volumes:
   sql-data:
